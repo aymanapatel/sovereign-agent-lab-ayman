@@ -1,0 +1,301 @@
+= AYMAN REASEARCH
+:toc: left
+:toclevels: 3
+:icons: font
+:sectanchors:
+
+== Week 1
+
+=== exercise1_context_engineering.md
+
+NOTE: Go deeper on why formatting and placement change model accuracy (the core idea behind Exercise 1).
+
+[cols="3,6,2",options="header"]
+|===
+|Link + Heading |Multi-item notes |Type
+
+|https://arxiv.org/abs/2307.03172[Lost in the Middle: How Language Models Use Long Contexts (Liu et al., 2023)]
+a|
+* Why it matters: Key paper for this exercise; shows answer retrieval drops when relevant information sits in the middle of long context.
+* Focus: Beginning vs middle vs end position effects.
+|Paper
+
+|https://arxiv.org/abs/1706.03762[Attention Is All You Need (Vaswani et al., 2017)]
+a|
+* Why it matters: Transformer attention foundations behind primacy/recency behavior.
+* Focus: Scaled dot-product attention and positional encoding.
+|Paper
+
+|https://www.promptingguide.ai/[Prompting Guide]
+a|
+* Why it matters: Practical formatting and prompting patterns directly relevant to plain/XML/sandwich setup.
+* Focus: Prompt components, decomposition, output constraints.
+|Documentation
+
+|https://platform.openai.com/docs/guides/prompt-engineering[OpenAI Prompt Engineering Best Practices]
+a|
+* Why it matters: Production guidance on instruction order, delimiters, and strict output shape.
+* Focus: Instruction-first prompting and separators.
+|Documentation
+
+|https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview[Anthropic Prompt Engineering Overview]
+a|
+* Why it matters: Cross-vendor perspective on structured prompts and reliability.
+* Focus: XML-style structure, clear constraints, evaluation mindset.
+|Documentation
+
+|https://www.pinecone.io/learn/retrieval-augmented-generation/[RAG Triad and Retrieval Quality (Pinecone Learning)]
+a|
+* Why it matters: Connects exercise behavior to real retrieval pipelines and context-packing quality.
+* Focus: Relevance, retrieval quality, context construction.
+|Guide
+
+|https://python.langchain.com/docs/concepts/evaluation/[LangChain Evaluation Concepts]
+a|
+* Why it matters: Helps turn one-off prompt checks into repeatable eval workflows.
+* Focus: Dataset-driven evaluation and regression tracking.
+|Documentation
+
+|https://arxiv.org/search/?query=positional+bias+language+models&searchtype=all[Positional Bias in LLMs (search index)]
+a|
+* Why it matters: Expands beyond one paper into broader positional-bias literature.
+* Focus: Measurement methods for sensitivity to position.
+|Research index
+|===
+
+Suggested study order:
+
+. https://arxiv.org/abs/2307.03172[Lost in the Middle]
+. https://arxiv.org/abs/1706.03762[Attention Is All You Need]
+. https://platform.openai.com/docs/guides/prompt-engineering[OpenAI Prompt Engineering] + https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview[Anthropic Prompt Engineering]
+. https://www.promptingguide.ai/[Prompting Guide examples]
+. https://www.pinecone.io/learn/retrieval-augmented-generation/[RAG resource] + https://python.langchain.com/docs/concepts/evaluation/[Evaluation resource]
+
+Optional next experiment (30 min):
+
+* Extend week1/exercise1_context.py with 3 new conditions:
+** reverse_order (put Haymarket first/last alternation)
+** json_structured (same data in JSON objects)
+** long_noise_padding (insert unrelated lines before/after target)
+* Run 10 repetitions per condition with temperature=0 and compare error rate and token usage.
+
+=== exercise2_langgraph_research_agents.md
+
+NOTE: Go deep on autonomous tool-using agents, graph-based control flow, and reliability patterns behind Exercise 2.
+
+[cols="3,6,2",options="header"]
+|===
+|Link + Heading |Multi-item notes |Type
+
+|https://langchain-ai.github.io/langgraph/[LangGraph Python Docs]
+a|
+* Why it matters: Core framework for graph-based, stateful agent execution.
+* Focus: StateGraph, conditional edges, state handling.
+|Documentation
+
+|https://python.langchain.com/docs/concepts/agents/[LangChain Agents Overview]
+a|
+* Why it matters: Reference for ReAct-like tool-use loops and control flow.
+* Focus: Tool selection, loop stopping, recovery patterns.
+|Documentation
+
+|https://arxiv.org/abs/2210.03629[ReAct: Synergizing Reasoning and Acting in Language Models]
+a|
+* Why it matters: Foundational method for interleaving reasoning with tool actions.
+* Focus: Reasoning-action trace structure and correction behavior.
+|Paper
+
+|https://arxiv.org/abs/2302.04761[Toolformer: Language Models Can Teach Themselves to Use Tools]
+a|
+* Why it matters: Research on when tool calls help and when they are unnecessary.
+* Focus: Useful-call criteria and efficiency tradeoffs.
+|Paper
+
+|https://platform.openai.com/docs/guides/function-calling[OpenAI Function Calling / Tools]
+a|
+* Why it matters: Practical schema design and robust argument handling.
+* Focus: JSON schema quality and deterministic parsing.
+|Documentation
+
+|https://www.guardrailsai.com/docs[Guardrails AI Concepts]
+a|
+* Why it matters: Adds output validation to improve reliability and safety.
+* Focus: Validation, retries, fallbacks.
+|Documentation
+
+|https://docs.pydantic.dev/latest/[Pydantic v2 Docs]
+a|
+* Why it matters: Strong typing for tool I/O and agent state contracts.
+* Focus: Field constraints, validation errors, model design.
+|Documentation
+|===
+
+Suggested study order:
+
+. https://arxiv.org/abs/2210.03629[ReAct]
+. https://langchain-ai.github.io/langgraph/[LangGraph docs]
+. https://python.langchain.com/docs/concepts/agents/[LangChain agents]
+. https://platform.openai.com/docs/guides/function-calling[Function calling] + https://docs.pydantic.dev/latest/[Pydantic]
+. https://www.guardrailsai.com/docs[Guardrails] + https://arxiv.org/abs/2302.04761[Toolformer]
+
+Optional next experiment (45 min):
+
+* Instrument tool calls in week1/exercise2_langgraph.py:
+** track total tool calls
+** track failed calls and retries
+** track final answer quality
+* Compare runs with and without explicit tool descriptions.
+
+=== exercise3_rasa_calm_flows_and_actions.md
+
+NOTE: Go deeper on deterministic conversational architecture in the exercise3_rasa folder (flows and actions).
+
+[cols="3,6,2",options="header"]
+|===
+|Link + Heading |Multi-item notes |Type
+
+|https://rasa.com/docs/[Rasa Pro Docs (CALM and Flows)]
+a|
+* Why it matters: Primary reference for deterministic flow design and policy behavior.
+* Focus: Flow branching, slot logic, action integration.
+|Documentation
+
+|https://rasa.com/docs/rasa/custom-actions[Rasa Custom Actions]
+a|
+* Why it matters: Direct mapping to actions implementation in the exercise.
+* Focus: Action classes, dispatcher usage, tracker state.
+|Documentation
+
+|https://rasa.com/docs/rasa/forms[Rasa Forms and Slot Handling Concepts]
+a|
+* Why it matters: Structured data collection and validation in dialogue turns.
+* Focus: Required slots, validation, fallback paths.
+|Documentation
+
+|https://rasa.com/docs/rasa/conversation-driven-development/[Conversation-Driven Development (Rasa)]
+a|
+* Why it matters: Iterative method for improving assistant behavior from real conversations.
+* Focus: Story tests, edge-case capture, flow hardening.
+|Documentation
+
+|https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/[Designing Machine Learning Systems - Production Chatbot Sections (Chip Huyen)]
+a|
+* Why it matters: Production lens on reliability, monitoring, and lifecycle management.
+* Focus: Failure modes and human-in-the-loop escalation.
+|Book
+
+|https://owasp.org/www-project-top-10-for-large-language-model-applications/[OWASP LLM Top 10]
+a|
+* Why it matters: Security baseline for customer-facing conversational systems.
+* Focus: Injection, data leakage, policy bypass risks.
+|Security standard
+
+|https://learn.microsoft.com/azure/bot-service/bot-service-design-conversation-flow[Microsoft Bot Framework Design Guidelines]
+a|
+* Why it matters: Non-Rasa conversation design patterns transferable across frameworks.
+* Focus: State handling, interruptions, escalation.
+|Documentation
+
+|https://cloud.google.com/dialogflow/cx/docs/concept[Dialogflow CX Concepts]
+a|
+* Why it matters: Alternative flow-first architecture for cross-framework comparison.
+* Focus: Pages, routes, parameters lifecycle.
+|Documentation
+
+|https://arxiv.org/abs/2005.05758[A Survey on Dialogue Systems: Recent Advances and New Frontiers]
+a|
+* Why it matters: Broad map of task-oriented and open-domain dialogue research.
+* Focus: Dialogue state tracking, policy learning, evaluation.
+|Survey paper
+
+|https://arxiv.org/abs/2005.05298[SOLOIST: Building Task Bots at Scale with Transfer Learning and Minimal Dialogue Data]
+a|
+* Why it matters: Research on low-data task bots and transfer learning.
+* Focus: Schema transfer setup and robustness claims.
+|Paper
+
+|https://arxiv.org/abs/1810.00278[MultiWOZ 2.0: A Large-Scale Multi-Domain Wizard-of-Oz Dataset for Task-Oriented Dialogue Modelling]
+a|
+* Why it matters: Canonical benchmark for task-oriented dialogue evaluation.
+* Focus: Annotation schema, domain transitions, limitations.
+|Dataset paper
+
+|https://parl.ai/[ParlAI Platform (Meta AI)]
+a|
+* Why it matters: Open platform for reproducible dialogue experiments.
+* Focus: Built-in tasks, evaluation scripts, workflows.
+|Platform
+|===
+
+Suggested study order:
+
+. https://arxiv.org/abs/2005.05758[Survey on dialogue systems]
+. https://arxiv.org/abs/1810.00278[MultiWOZ] + https://arxiv.org/abs/2005.05298[SOLOIST]
+. https://rasa.com/docs/[Rasa Pro docs] + https://rasa.com/docs/rasa/custom-actions[Custom actions]
+. https://learn.microsoft.com/azure/bot-service/bot-service-design-conversation-flow[Microsoft Bot Framework] + https://cloud.google.com/dialogflow/cx/docs/concept[Dialogflow CX]
+. https://owasp.org/www-project-top-10-for-large-language-model-applications/[OWASP LLM Top 10] + https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/[Production reliability]
+
+Optional next experiment (40 min):
+
+* In exercise3_rasa/data/flows.yml, add one strict rejection path for out-of-policy requests.
+* In exercise3_rasa/actions/actions.py, log every decision branch and test with 10 adversarial prompts.
+
+=== exercise4_mcp_shared_tool_layer.md
+
+NOTE: Go deep on MCP architecture and multi-agent shared tool layers behind Exercise 4.
+
+[cols="3,6,2",options="header"]
+|===
+|Link + Heading |Multi-item notes |Type
+
+|https://modelcontextprotocol.io/[Model Context Protocol (Official Site)]
+a|
+* Why it matters: Protocol foundation for shared tool layers in multi-agent setups.
+* Focus: Tools, resources, transport model, capability negotiation.
+|Specification docs
+
+|https://github.com/modelcontextprotocol/specification[MCP Specification (GitHub)]
+a|
+* Why it matters: Canonical technical details and protocol evolution.
+* Focus: Schemas, request/response contracts, compatibility.
+|Specification
+
+|https://github.com/modelcontextprotocol/python-sdk[FastMCP Python SDK]
+a|
+* Why it matters: Practical server/client implementation patterns in Python.
+* Focus: Tool registration, server setup, structured I/O.
+|SDK docs
+
+|https://docs.anthropic.com/en/docs/agents-and-tools/mcp[Anthropic MCP Documentation]
+a|
+* Why it matters: Practical design guidance for agent-tool interoperability.
+* Focus: Discoverability, sandboxing, permissions.
+|Documentation
+
+|https://www.jsonrpc.org/specification[JSON-RPC 2.0 Specification]
+a|
+* Why it matters: Underlying message semantics relevant to many MCP transports.
+* Focus: IDs, batch behavior, error structure.
+|Specification
+
+|https://12factor.net/[Twelve-Factor App]
+a|
+* Why it matters: Operational best practices for running MCP services across environments.
+* Focus: Config, stateless processes, backing services.
+|Guide
+|===
+
+Suggested study order:
+
+. https://modelcontextprotocol.io/[MCP official site] + https://github.com/modelcontextprotocol/specification[spec repo]
+. https://github.com/modelcontextprotocol/python-sdk[Python SDK examples]
+. https://docs.anthropic.com/en/docs/agents-and-tools/mcp[Anthropic MCP docs]
+. https://www.jsonrpc.org/specification[JSON-RPC] + https://12factor.net/[operational design resource]
+
+Optional next experiment (45 min):
+
+* Add one new MCP tool in sovereign_agent/tools/mcp_venue_server.py with explicit schema validation.
+* Consume it in week1/exercise4_mcp_client.py and measure:
+** latency per call
+** schema error frequency
+** behavior when the tool is unavailable.

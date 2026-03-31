@@ -1,0 +1,484 @@
+= Sovereign Agent Lab - Architecture Diagram
+:toc: left
+:toclevels: 3
+:icons: font
+
+== System Overview
+
+This architecture consists of two complementary agent patterns working together:
+
+. *Headless Automator* (LangGraph) - Autonomous research agent for open-ended tasks
+. *Digital Employee* (Rasa CALM) - Structured conversational agent for high-stakes interactions
+
+Both agents share a common tool layer through MCP (Model Context Protocol).
+
+== High-Level Architecture
+
+[mermaid]
+....
+flowchart TB
+    subgraph "User / External Systems"
+        USER[👤 User - Rod's Request]
+        MANAGER[👤 Pub Manager Call]
+    end
+
+    subgraph "Sovereign Agent System"
+        subgraph "Headless Automator (LangGraph)"
+            direction TB
+            RESEARCH_TASK[Research Task]
+            LG_AGENT[LangGraph Agent<br/>ReAct Loop]
+            LLM_LG[LLM<br/>Llama 3.3 70B]
+        end
+
+        subgraph "Shared Tool Layer (MCP)"
+            direction TB
+            MCP_SERVER[MCP Venue Server<br/>FastMCP]
+            VENUE_DB[(Venue Database)]
+            TOOLS[Venue Tools]
+        end
+
+        subgraph "Digital Employee (Rasa CALM)"
+            direction TB
+            CALL[Inbound Call]
+            CALM[Rasa Pro CALM<br/>Flow Engine]
+            FLOWS[CALM Flows<br/>flows.yml]
+            ACTIONS[Action Server<br/>actions.py]
+        end
+    end
+
+    subgraph "External APIs"
+        WEATHER[Open-Meteo API]
+        NEBIUS[Nebius AI API]
+    end
+
+    USER --> RESEARCH_TASK
+    RESEARCH_TASK --> LG_AGENT
+    LG_AGENT <--> LLM_LG
+    LG_AGENT <-->|MCP Client| MCP_SERVER
+
+    MANAGER --> CALL
+    CALL --> CALM
+    CALM <--> FLOWS
+    CALM --> ACTIONS
+    ACTIONS <-->|MCP Client| MCP_SERVER
+
+    MCP_SERVER --> VENUE_DB
+    MCP_SERVER --> TOOLS
+
+    TOOLS --> WEATHER
+    LLM_LG --> NEBIUS
+    CALM --> NEBIUS
+....
+
+== Headless Automator - Detailed Flow
+
+[mermaid]
+....
+flowchart TD
+    TASK[Task Input<br/>Find pub for 160 vegan guests]
+
+    subgraph LANGGRAPH [LangGraph ReAct Agent]
+        direction TB
+
+        REACT[create_react_agent]
+
+        subgraph LOOP [Agent Loop]
+            direction TB
+            THINK[Reasoning<br/>What do I need?]
+            ACT[Action<br/>Call tool]
+            OBS[Observation<br/>Process result]
+        end
+
+        ANS[Final Answer]
+    end
+
+    subgraph TOOLS [Tool Registry]
+        direction TB
+        T1[check_pub_availability]
+        T2[get_edinburgh_weather]
+        T3[calculate_catering_cost]
+        T4[generate_event_flyer]
+    end
+
+    LLM[LLM<br/>meta-llama/Llama-3.3-70B-Instruct]
+
+    RESULT[Result<br/>final_answer, tool_calls_made, full_trace]
+
+    TASK --> REACT
+    REACT --> THINK
+    THINK --> LLM
+    LLM --> ACT
+    ACT --> T1
+    ACT --> T2
+    ACT --> T3
+    ACT --> T4
+    T1 --> OBS
+    T2 --> OBS
+    T3 --> OBS
+    T4 --> OBS
+    OBS --> THINK
+    THINK -->|Complete| ANS
+    ANS --> RESULT
+....
+
+== Digital Employee - Detailed Flow
+
+[mermaid]
+....
+flowchart TD
+    subgraph "Rasa CALM Agent (exercise3_rasa/)"
+        direction TB
+
+        CALL[Inbound Call<br/>from Pub Manager]
+
+        subgraph "CALM Flow Engine"
+            LLM_SELECT[LLM Flow Selection<br/>Which flow matches?]
+
+            subgraph "Flows (flows.yml)"
+                F1[confirm_booking<br/>Main booking flow]
+                F2[handle_out_of_scope<br/>Deflection flow]
+            end
+
+            subgraph "Slot Collection"
+                S1[Collect guest_count<br/>utter_ask_guest_count]
+                S2[Collect vegan_count<br/>utter_ask_vegan_count]
+                S3[Collect deposit_amount_gbp<br/>utter_ask_deposit_amount_gbp]
+            end
+        end
+
+        subgraph "Business Rules (actions.py)"
+            ACTION[action_validate_booking]
+
+            subgraph "Constraint Guards"
+                G1[Capacity Guard<br/>guests ≤ 170]
+                G2[Deposit Guard<br/>deposit ≤ £300]
+                G3[Vegan Ratio Guard<br/>vegan/guests ≤ 80%]
+                G4[Cutoff Time Guard<br/>past 16:45]
+            end
+        end
+
+        RESULT{Result}
+        CONFIRM[✅ Confirm Booking]
+        ESCALATE[⚠️ Escalate to Rod]
+    end
+
+    CALL --> LLM_SELECT
+    LLM_SELECT --> F1
+    LLM_SELECT --> F2
+    F1 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> ACTION
+
+    ACTION --> G1
+    G1 -->|Pass| G2
+    G1 -->|Fail| ESCALATE
+    G2 -->|Pass| G3
+    G2 -->|Fail| ESCALATE
+    G3 -->|Pass| G4
+    G3 -->|Fail| ESCALATE
+    G4 -->|Pass| CONFIRM
+    G4 -->|Fail| ESCALATE
+
+    CONFIRM --> RESULT
+    ESCALATE --> RESULT
+....
+
+== MCP Shared Tool Layer
+
+[mermaid]
+....
+flowchart LR
+    subgraph "MCP Server (mcp_venue_server.py)"
+        direction TB
+
+        MCP[FastMCP Server<br/>EdinburghVenueServer]
+
+        subgraph "Venue Database"
+            V1[The Albanach<br/>capacity: 180, vegan: ✅]
+            V2[The Haymarket Vaults<br/>capacity: 160, vegan: ✅]
+            V3[The Guilford Arms<br/>capacity: 200, vegan: ❌]
+            V4[The Bow Bar<br/>capacity: 80, vegan: ✅, status: full]
+        end
+
+        subgraph "MCP Tools"
+            MT1[search_venues<br/>min_capacity, requires_vegan]
+            MT2[get_venue_details<br/>pub_name]
+        end
+    end
+
+    subgraph "Consumers"
+        C1[LangGraph Agent<br/>MCP Client]
+        C2[Rasa Action<br/>MCP Client]
+    end
+
+    C1 <-->|stdio transport| MCP
+    C2 <-->|stdio transport| MCP
+
+    MCP --> MT1
+    MCP --> MT2
+    MT1 --> VENUE_DB[(VENUES dict)]
+    MT2 --> VENUE_DB
+....
+
+== Exercise Flow and Component Interactions
+
+[mermaid]
+....
+sequenceDiagram
+    autonumber
+
+    participant User as 👤 User (Rod)
+    participant LG as Headless Automator<br/>LangGraph
+    participant MCP as MCP Server
+    participant Weather as Weather API
+    participant Rasa as Digital Employee<br/>Rasa CALM
+    participant Manager as 👤 Pub Manager
+
+    rect rgb(230, 245, 255)
+        Note over User,LG: Exercise 1-2: Research Phase
+        User->>LG: Task: Find venue for 160<br/>vegan guests tonight
+        LG->>LG: Reasoning: Need to check<br/>weather and venues
+        LG->>Weather: get_edinburgh_weather()
+        Weather-->>LG: Temp, conditions, outdoor_ok
+        LG->>LG: Select venue tools
+    end
+
+    rect rgb(255, 245, 230)
+        Note over LG,MCP: Exercise 4: MCP Integration
+        LG->>MCP: search_venues(capacity=160, vegan=true)
+        MCP-->>LG: Matches: Albanach,<br/>Haymarket Vaults
+        LG->>MCP: get_venue_details("The Albanach")
+        MCP-->>LG: Full venue info
+        LG->>User: Research complete:<br/>Recommendation + Flyer
+    end
+
+    rect rgb(230, 255, 230)
+        Note over Rasa,Manager: Exercise 3: Confirmation Phase
+        Manager->>Rasa: "Calling to confirm booking"
+        Rasa->>Rasa: LLM selects confirm_booking flow
+        Rasa->>Manager: "How many guests?"
+        Manager-->>Rasa: "About 160 people"
+        Rasa->>Rasa: LLM extracts: guest_count=160
+        Rasa->>Manager: "How many need vegan meals?"
+        Manager-->>Rasa: "Around 40"
+        Rasa->>Rasa: LLM extracts: vegan_count=40
+        Rasa->>Manager: "What deposit?"
+        Manager-->>Rasa: "£250"
+        Rasa->>Rasa: LLM extracts: deposit_amount_gbp=250
+    end
+
+    rect rgb(255, 230, 245)
+        Note over Rasa,Manager: Business Rules Validation
+        Rasa->>Rasa: ActionValidateBooking
+        Rasa->>Rasa: Check capacity: 160 ≤ 170 ✅
+        Rasa->>Rasa: Check deposit: 250 ≤ 300 ✅
+        Rasa->>Rasa: Check vegan ratio: 40/160=25% ≤ 80% ✅
+        Rasa-->>Manager: "Booking confirmed: 160 guests,<br/>40 vegan, £250 deposit"
+    end
+....
+
+== Data Flow Architecture
+
+[mermaid]
+....
+flowchart LR
+    subgraph "Input Layer"
+        I1[Natural Language Task]
+        I2[Voice/Phone Call]
+    end
+
+    subgraph "Processing Layer"
+        P1[LangGraph<br/>ReAct Loop]
+        P2[Rasa CALM<br/>Flow Engine]
+    end
+
+    subgraph "LLM Layer (Nebius)"
+        L1[meta-llama/Llama-3.3-70B-Instruct]
+    end
+
+    subgraph "Tool Layer"
+        T1[Venue Tools<br/>venue_tools.py]
+        T2[MCP Server<br/>mcp_venue_server.py]
+        T3[Weather API]
+    end
+
+    subgraph "Business Logic"
+        B1[Python Constraint Guards<br/>actions.py]
+    end
+
+    subgraph "Output Layer"
+        O1[Research Report + Flyer]
+        O2[Booking Confirmation]
+        O3[Escalation Alert]
+    end
+
+    I1 --> P1
+    I2 --> P2
+    P1 <--> L1
+    P2 <--> L1
+    P1 --> T1
+    P1 --> T2
+    P2 --> T2
+    T1 --> T3
+    T2 --> T3
+    P2 --> B1
+    P1 --> O1
+    B1 --> O2
+    B1 --> O3
+....
+
+== Key Architectural Decisions
+
+[mermaid]
+....
+flowchart TD
+    ROOT[Why Two Architectures?]
+
+    ROOT --> Q1{Problem Type?}
+
+    Q1 -->|Open-ended<br/>Unknown steps| A1[Headless Automator<br/>LangGraph]
+    Q1 -->|Structured<br/>High stakes| A2[Digital Employee<br/>Rasa CALM]
+
+    A1 --> C1[Characteristics:
+    - Probabilistic reasoning
+    - Tool autonomy
+    - Flexible path
+    - Research tasks]
+
+    A2 --> C2[Characteristics:
+    - Deterministic rules
+    - Explicit flows
+    - Auditable decisions
+    - Financial/legal tasks]
+
+    subgraph "Shared Foundation"
+        MCP[MCP Tool Layer]
+        VENUE[Venue Database]
+    end
+
+    A1 -.->|Uses| MCP
+    A2 -.->|Uses| MCP
+    MCP --> VENUE
+....
+
+== Project Structure Map
+
+[mermaid]
+....
+flowchart TD
+    ROOT[sovereign-agent-lab/]
+
+    ROOT --> MAKE[Makefile]
+    ROOT --> ENV[.env]
+    ROOT --> PY[pyproject.toml]
+
+    ROOT --> SA[sovereign_agent/]
+    ROOT --> W1[week1/]
+    ROOT --> RASA[exercise3_rasa/]
+
+    SA --> TOOLS[tools/]
+    SA --> AGENTS[agents/]
+    SA --> TESTS[tests/]
+
+    TOOLS --> VT[venue_tools.py]
+    TOOLS --> MCP[mcp_venue_server.py]
+
+    AGENTS --> RA[research_agent.py]
+
+    W1 --> E1[exercise1_context.py]
+    W1 --> E2[exercise2_langgraph.py]
+    W1 --> E4[exercise4_mcp_client.py]
+    W1 --> ANS[answers/]
+    W1 --> OUT[outputs/]
+
+    RASA --> DATA[data/]
+    RASA --> ACT[actions/]
+    RASA --> DOM[domain.yml]
+    RASA --> CFG[config.yml]
+
+    DATA --> FLOWS[flows.yml]
+    ACT --> AP[actions.py]
+
+    style SA fill:#e1f5e1
+    style RASA fill:#e1f5fe
+    style TOOLS fill:#fff9e1
+....
+
+== Technology Stack
+
+[cols="1,1,2",options="header"]
+|===
+|Component |Technology |Purpose
+
+|Headless Automator
+|LangGraph + LangChain
+|ReAct agent loop
+
+|Digital Employee
+|Rasa Pro CALM
+|Conversational AI flows
+
+|LLM
+|Meta Llama 3.3 70B
+|Reasoning and generation
+
+|API Platform
+|Nebius AI Studio
+|Model hosting
+
+|Tool Protocol
+|MCP (Model Context Protocol)
+|Shared tool layer
+
+|Weather Data
+|Open-Meteo API
+|Real-time weather
+
+|Package Manager
+|uv
+|Python environment
+
+|Build
+|make
+|Command automation
+|===
+
+== Week-by-Week Evolution
+
+[mermaid]
+....
+timeline
+    title Sovereign Agent Evolution
+
+    section Week 1
+        Headless Automator : Basic ReAct loop
+                         : 4 venue tools
+        Digital Employee   : CALM confirmation flow
+                         : Business rule guards
+
+    section Week 2
+        Headless Automator : Real web search
+                         : File operations
+        Digital Employee   : MCP tool access
+                         : Live venue data
+
+    section Week 3
+        Headless Automator : Planner-Executor split
+                         : DeepSeek R1 + Llama 70B
+        Digital Employee   : Advanced CALM flows
+                         : Conditional branching
+
+    section Week 4
+        Headless Automator : CLAUDE.md memory
+                         : Vector store
+        Digital Employee   : RAG knowledge base
+
+    section Week 5
+        Headless Automator : Observability
+                         : Safety guardrails
+        Digital Employee   : Voice pipeline
+                         : Whisper -> Rasa -> TTS
+        Integration        : Both agents connected
+                         : MCP shared layer
+....

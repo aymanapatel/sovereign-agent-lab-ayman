@@ -1,0 +1,75 @@
+[32m✓ .env file found(B[m
+[35mExercise 2 — Task C: Failure Modes(B[m
+
+uv run python week1/exercise2_langgraph.py task_c
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+
+--- Task C / Scenario 1: First Choice Unavailable ---
+
+=================================================================
+  TASK C / Scenario 1 — First Choice Unavailable
+=================================================================
+
+  [HUMAN]
+  Check The Bow Bar first for 160 vegan guests tonight. If it doesn't meet the requirements, check any other available venue.
+
+  [TOOL]
+  {"success": true, "pub_name": "The Bow Bar", "address": "80 West Bow, Edinburgh", "capacity": 80, "vegan": true, "status": "full", "meets_all_constraints": false}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Haymarket Vaults", "address": "1 Dalry Road, Edinburgh", "capacity": 160, "vegan": true, "status": "available", "meets_all_constraints": true}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Guilford Arms", "address": "1 West Register Street, Edinburgh", "capacity": 200, "vegan": false, "status": "available", "meets_all_constraints": false}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Albanach", "address": "2 Hunter Square, Edinburgh", "capacity": 180, "vegan": true, "status": "available", "meets_all_constraints": true}
+
+  [AI]
+  The function calls show that The Bow Bar does not meet the requirements because it is full. The Haymarket Vaults and The Albanach meet all the constraints, but The Guilford Arms does not have vegan options.
+
+
+--- Task C / Scenario 2: Impossible Constraint ---
+
+=================================================================
+  TASK C / Scenario 2 — Impossible Constraint (300 guests)
+=================================================================
+
+  [HUMAN]
+  Find a venue from our known venues for 300 people with vegan options.
+
+  [TOOL]
+  {"success": true, "pub_name": "The Albanach", "address": "2 Hunter Square, Edinburgh", "capacity": 180, "vegan": true, "status": "available", "meets_all_constraints": false}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Haymarket Vaults", "address": "1 Dalry Road, Edinburgh", "capacity": 160, "vegan": true, "status": "available", "meets_all_constraints": false}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Guilford Arms", "address": "1 West Register Street, Edinburgh", "capacity": 200, "vegan": false, "status": "available", "meets_all_constraints": false}
+
+  [TOOL]
+  {"success": true, "pub_name": "The Bow Bar", "address": "80 West Bow, Edinburgh", "capacity": 80, "vegan": true, "status": "full", "meets_all_constraints": false}
+
+  [AI]
+  None of the known venues meet the capacity and dietary requirements.
+
+
+--- Task C / Scenario 3: Out of Scope ---
+
+=================================================================
+  TASK C / Scenario 3 — Out of Scope
+=================================================================
+
+  [HUMAN]
+  What time does the last train leave Edinburgh Waverley for London tonight?
+
+  [AI]
+  Your input is lacking necessary details. Please provide more information or specify the task you need help with.
+
+
+→ Answer the Scenario questions in week1/answers/ex2_answers.py
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex2_results.json
+    Fill in week1/answers/ex2_answers.py

@@ -156,3 +156,6 @@ __marimo__/
 
 # Custom ignored files/folders
 week1/*.txt
+week1/outputs/txt/*/*.txt
+outputs/txt/*/*.txt
+AYMAN_PROMPTS.adoc

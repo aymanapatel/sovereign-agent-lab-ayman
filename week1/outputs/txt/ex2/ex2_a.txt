@@ -1,0 +1,26 @@
+[32m✓ .env file found(B[m
+[35mExercise 2 — Task A: Main Edinburgh Brief(B[m
+
+uv run python week1/exercise2_langgraph.py task_a
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+
+--- Task A: Main Edinburgh Brief ---
+
+=================================================================
+  TASK A — Main Edinburgh Brief
+=================================================================
+
+  [HUMAN]
+  Rod needs a pub tonight for 160 people with vegan options and a quiet corner for a 30-minute webinar segment. Check The Albanach and The Haymarket Vaults. If one works, calculate catering at £35 per head. Also check Edinburgh weather for outdoor drinks suitability. Finally, generate a promotional flyer for the confirmed venue with the theme 'AI Meetup, Edinburgh, professional'.
+
+  [AI]
+  ["{\"type\": \"function\", \"name\": \"check_pub_availability\", \"parameters\": {\"pub_name\": \"The Albanach\", \"required_capacity\": \"160\", \"requires_vegan\": \"true\"}}", "{\"type\": \"function\", \"name\": \"check_pub_availability\", \"parameters\": {\"pub_name\": \"The Haymarket Vaults\", \"required_capacity\": \"160\", \"requires_vegan\": \"true\"}}", "{\"type\": \"function\", \"name\": \"calculate_catering_cost\", \"parameters\": {\"guests\": \"160\", \"price_per_head_gbp\": \"35\"}}...
+
+  ⚠️  No tool calls were made. Check that sovereign_agent/ is importable.
+
+→ Record results in week1/answers/ex2_answers.py
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex2_results.json
+    Fill in week1/answers/ex2_answers.py

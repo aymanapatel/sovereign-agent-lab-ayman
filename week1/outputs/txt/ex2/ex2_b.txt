@@ -1,0 +1,32 @@
+[32m✓ .env file found(B[m
+[35mExercise 2 — Task B: Flyer Tool(B[m
+
+[33mHave you implemented generate_event_flyer in sovereign_agent/tools/venue_tools.py?(B[m
+[33mLook for the '# ── TODO' block and replace the stub.(B[m
+
+uv run python week1/exercise2_langgraph.py task_b
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+
+--- Task B: Flyer Tool ---
+  If generate_event_flyer is still a stub, you'll see 'STUB' in the output.
+  Implement the TODO in sovereign_agent/tools/venue_tools.py first.
+
+
+=================================================================
+  TASK B — Flyer Tool
+=================================================================
+
+  [HUMAN]
+  The Haymarket Vaults is confirmed for 160 guests tonight. Generate a promotional flyer with the theme 'Edinburgh AI Meetup, tech professionals, modern venue'.
+
+  [TOOL]
+  {"success": true, "prompt_used": "Professional event flyer for Edinburgh AI Meetup, tech professionals, modern venue at The Haymarket Vaults, Edinburgh. 160 guests tonight. Warm lighting, Scottish architecture background, clean modern typography.", "image_url": "https://pictures-storage.storage.eu-north1.nebius.cloud/text2img-489b7658-2c58-4283-bc37-36bd1ed5c2f7_00001_.webp"}
+
+  [AI]
+  The provided function call is for generating a promotional event flyer for the confirmed Edinburgh venue, The Haymarket Vaults, with 160 guests and the theme 'Edinburgh AI Meetup, tech professionals, modern venue'.
+
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex2_results.json
+    Fill in week1/answers/ex2_answers.py

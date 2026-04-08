@@ -1,0 +1,36 @@
+[34mRunning tool unit tests...(B[m
+uv run pytest sovereign_agent/tests/test_week1.py -v
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+============================= test session starts ==============================
+platform darwin -- Python 3.14.3, pytest-9.0.2, pluggy-1.6.0 -- /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/aymanpatel/Desktop/nebius/assignments/module2-agents
+configfile: pyproject.toml
+plugins: langsmith-0.7.23, anyio-4.13.0
+collecting ... collected 15 items
+
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_available_venue_meets_all PASSED [  6%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_full_venue_fails_constraints PASSED [ 13%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_insufficient_capacity_fails PASSED [ 20%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_no_vegan_fails_when_required PASSED [ 26%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_unknown_venue_returns_error PASSED [ 33%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_returns_address PASSED [ 40%]
+sovereign_agent/tests/test_week1.py::TestCheckPubAvailability::test_returns_json_string PASSED [ 46%]
+sovereign_agent/tests/test_week1.py::TestCalculateCateringCost::test_correct_calculation PASSED [ 53%]
+sovereign_agent/tests/test_week1.py::TestCalculateCateringCost::test_zero_guests_fails PASSED [ 60%]
+sovereign_agent/tests/test_week1.py::TestCalculateCateringCost::test_negative_price_fails PASSED [ 66%]
+sovereign_agent/tests/test_week1.py::TestCalculateCateringCost::test_rounding PASSED [ 73%]
+sovereign_agent/tests/test_week1.py::TestGenerateEventFlyer::test_returns_required_keys PASSED [ 80%]
+sovereign_agent/tests/test_week1.py::TestGenerateEventFlyer::test_prompt_includes_venue_name PASSED [ 86%]
+sovereign_agent/tests/test_week1.py::TestGenerateEventFlyer::test_not_stub_when_implemented PASSED [ 93%]
+sovereign_agent/tests/test_week1.py::TestGenerateEventFlyer::test_image_url_is_string_when_successful PASSED [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25
+  /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+    from pydantic.v1.fields import FieldInfo as FieldInfoV1
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 15 passed, 1 warning in 11.31s ========================
+
+[33mFix any failures above before running the exercises.(B[m

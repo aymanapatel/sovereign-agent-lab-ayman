@@ -50,8 +50,10 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Path to the shared MCP server in sovereign_agent/
-SERVER_SCRIPT = str(Path(__file__).parent.parent / "sovereign_agent" / "tools" / "mcp_venue_server.py")
-OUTPUTS_DIR   = Path(__file__).parent / "outputs"
+SERVER_SCRIPT = str(
+    Path(__file__).parent.parent / "sovereign_agent" / "tools" / "mcp_venue_server.py"
+)
+OUTPUTS_DIR = Path(__file__).parent / "outputs"
 OUTPUTS_DIR.mkdir(exist_ok=True)
 
 
@@ -64,6 +66,7 @@ OUTPUTS_DIR.mkdir(exist_ok=True)
 # Each closure must capture its own tool_name. If we used a lambda in a loop,
 # every closure would share the last value of tool_name — a classic Python gotcha.
 
+
 def _make_mcp_caller(tool_name: str, server_script: str):
     def call(**kwargs) -> str:
         async def _inner() -> str:
@@ -73,7 +76,9 @@ def _make_mcp_caller(tool_name: str, server_script: str):
                     await session.initialize()
                     result = await session.call_tool(tool_name, kwargs)
                     return result.content[0].text if result.content else "{}"
+
         return asyncio.run(_inner())
+
     call.__name__ = tool_name
     return call
 
@@ -90,7 +95,7 @@ async def discover_tools(server_script: str) -> list:
     async with stdio_client(params) as (r, w):
         async with ClientSession(r, w) as session:
             await session.initialize()
-            raw   = await session.list_tools()
+            raw = await session.list_tools()
             tools = []
             for t in raw.tools:
                 lc_tool = StructuredTool.from_function(
@@ -104,16 +109,18 @@ async def discover_tools(server_script: str) -> list:
 
 # ─── Agent queries ────────────────────────────────────────────────────────────
 
+
 def extract_trace(result: dict) -> list:
     trace = []
     for m in result["messages"]:
-        role    = getattr(m, "type", "unknown")
+        role = getattr(m, "type", "unknown")
         content = m.content
         if isinstance(content, list):
             for block in content:
                 if isinstance(block, dict) and block.get("type") == "tool_use":
-                    trace.append({"role": "tool_call", "tool": block["name"],
-                                  "args": block.get("input", {})})
+                    trace.append(
+                        {"role": "tool_call", "tool": block["name"], "args": block.get("input", {})}
+                    )
         elif content:
             trace.append({"role": role, "content": str(content)})
     return trace
@@ -145,7 +152,7 @@ async def main() -> None:
     tools, tool_names = await discover_tools(SERVER_SCRIPT)
     print(f"\n  Discovered {len(tools)} tools: {tool_names}")
 
-    agent  = create_react_agent(llm, tools)
+    agent = create_react_agent(llm, tools)
     output = {"server_script": SERVER_SCRIPT, "tools_discovered": tool_names, "queries": {}}
 
     # ── Query 1: search + detail fetch ────────────────────────────────────────
@@ -153,7 +160,7 @@ async def main() -> None:
     print(f"\n{'=' * 65}")
     print("  Query 1 — Search + Detail Fetch")
     print(f"{'=' * 65}\n")
-    r1     = agent.invoke({"messages": [("user", q1)]})
+    r1 = agent.invoke({"messages": [("user", q1)]})
     trace1 = extract_trace(r1)
     print_trace(trace1)
     output["queries"]["query_1"] = {"query": q1, "trace": trace1}
@@ -163,7 +170,7 @@ async def main() -> None:
     print(f"\n{'=' * 65}")
     print("  Query 2 — Impossible Constraint")
     print(f"{'=' * 65}\n")
-    r2     = agent.invoke({"messages": [("user", q2)]})
+    r2 = agent.invoke({"messages": [("user", q2)]})
     trace2 = extract_trace(r2)
     print_trace(trace2)
     output["queries"]["query_2"] = {"query": q2, "trace": trace2}

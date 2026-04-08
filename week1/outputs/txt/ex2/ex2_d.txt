@@ -1,0 +1,44 @@
+[35mExercise 2 — Task D: Agent Graph(B[m
+
+uv run python week1/exercise2_langgraph.py task_d
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/exercise2_langgraph.py:232: LangGraphDeprecatedSinceV10: create_react_agent has been moved to `langchain.agents`. Please update your import to `from langchain.agents import create_agent`. Deprecated in LangGraph V1.0 to be removed in V2.0.
+  agent = create_react_agent(llm, [
+
+=================================================================
+  TASK D — Agent Graph Structure (Mermaid)
+=================================================================
+  Paste the output below into https://mermaid.live
+
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	agent(agent)
+	tools(tools)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> agent;
+	agent -.-> __end__;
+	agent -.-> tools;
+	tools --> agent;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+
+
+  Now open exercise3_rasa/data/flows.yml
+  Both files describe the agent's behaviour — compare them.
+
+  LangGraph: one loop node, model decides the path at runtime
+  Rasa CALM: flows.yml — every task described explicitly, LLM picks the flow
+  Record your comparison in week1/answers/ex2_answers.py → TASK_D_COMPARISON
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex2_results.json
+    Fill in week1/answers/ex2_answers.py
+
+[33mPaste the Mermaid output above into: https://mermaid.live(B[m

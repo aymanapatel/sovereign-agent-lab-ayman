@@ -84,9 +84,21 @@ TOOLS = [
     generate_event_flyer,
 ]
 
+# System prompt: forces the model to call tools one at a time using the proper
+# function-calling mechanism instead of generating tool calls as text.
+# Llama-3.3-70B sometimes batches all tool calls into a text block when the
+# task is complex — this prompt prevents that regression.
+_SYSTEM_PROMPT = (
+    "You are a venue research assistant for Edinburgh events. "
+    "You have access to tools — always use them to answer questions. "
+    "Call tools one at a time: make a single tool call, observe the result, "
+    "then decide the next step. Never write out function calls as text; "
+    "always use the provided function-calling interface."
+)
+
 # Build the agent once at module load time.
 # Rebuilding it on every call would be wasteful.
-_agent = create_react_agent(llm, TOOLS)
+_agent = create_react_agent(llm, TOOLS, prompt=_SYSTEM_PROMPT)
 
 
 # ─── Public interface ─────────────────────────────────────────────────────────
@@ -122,13 +134,31 @@ def run_research_agent(task: str, max_turns: int = 8) -> dict:
         role    = getattr(m, "type", "unknown")
         content = m.content
 
-        # Tool-call messages have structured list content
+        # Primary path: LangChain/LangGraph with ChatOpenAI puts tool calls on
+        # the tool_calls attribute, not in content blocks.
+        if hasattr(m, "tool_calls") and m.tool_calls:
+            for tc in m.tool_calls:
+                entry = {
+                    "tool": tc["name"],
+                    "args": tc.get("args", {}),
+                }
+                tool_calls_made.append(entry)
+                full_trace.append({"role": "tool_call", **entry})
+            continue
+
+        # Fallback: Anthropic-style content list (type="tool_use") or
+        # older LangChain format where content is a list of JSON strings.
         if isinstance(content, list):
             for block in content:
-                if isinstance(block, dict) and block.get("type") == "tool_use":
+                if isinstance(block, str):
+                    try:
+                        block = json.loads(block)
+                    except (json.JSONDecodeError, TypeError):
+                        continue
+                if isinstance(block, dict) and block.get("type") in ("tool_use", "function"):
                     entry = {
-                        "tool": block["name"],
-                        "args": block.get("input", {}),
+                        "tool": block.get("name", ""),
+                        "args": block.get("input", block.get("parameters", {})),
                     }
                     tool_calls_made.append(entry)
                     full_trace.append({"role": "tool_call", **entry})

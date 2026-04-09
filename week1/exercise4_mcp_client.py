@@ -33,6 +33,7 @@ Then fill in week1/answers/ex4_answers.py.
 """
 
 import asyncio
+import concurrent.futures
 import json
 import os
 import sys
@@ -44,6 +45,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from pydantic import create_model
 
 load_dotenv()
 
@@ -56,11 +58,41 @@ SERVER_SCRIPT = str(
 OUTPUTS_DIR = Path(__file__).parent / "outputs"
 OUTPUTS_DIR.mkdir(exist_ok=True)
 
+# System prompt mirrors research_agent.py — forces the model to use the
+# function-calling interface one tool at a time instead of writing JSON text.
+_SYSTEM_PROMPT = (
+    "You are a venue research assistant for Edinburgh events. "
+    "You have access to tools — always use them to answer questions. "
+    "Call tools one at a time: make a single tool call, observe the result, "
+    "then decide the next step. Never write out function calls as text; "
+    "always use the provided function-calling interface."
+)
+
+
+# ─── Schema helper ────────────────────────────────────────────────────────────
+#
+# MCP tools carry a JSON Schema (inputSchema). We convert it to a Pydantic model
+# so LangChain can describe the parameters to the LLM. Without this, StructuredTool
+# derives an empty schema from **kwargs and the LLM has no idea what to pass.
+
+def _build_args_schema(input_schema: dict, model_name: str):
+    type_map = {"string": str, "integer": int, "boolean": bool, "number": float}
+    fields = {}
+    required = set(input_schema.get("required", []))
+    for fname, fschema in input_schema.get("properties", {}).items():
+        py_type = type_map.get(fschema.get("type", "string"), str)
+        fields[fname] = (py_type, ...) if fname in required else (py_type, None)
+    return create_model(model_name, **fields)
+
 
 # ─── MCP → LangChain bridge ───────────────────────────────────────────────────
 #
 # _make_mcp_caller returns a sync callable that, when invoked, starts a fresh
 # MCP session, calls the tool, and returns the result string.
+#
+# Why ThreadPoolExecutor?
+# asyncio.run() raises RuntimeError when called from inside a running event loop.
+# Running it in a worker thread gives it a clean, loop-free execution context.
 #
 # Why a factory function and not a lambda?
 # Each closure must capture its own tool_name. If we used a lambda in a loop,
@@ -77,7 +109,8 @@ def _make_mcp_caller(tool_name: str, server_script: str):
                     result = await session.call_tool(tool_name, kwargs)
                     return result.content[0].text if result.content else "{}"
 
-        return asyncio.run(_inner())
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(lambda: asyncio.run(_inner())).result()
 
     call.__name__ = tool_name
     return call
@@ -98,10 +131,12 @@ async def discover_tools(server_script: str) -> list:
             raw = await session.list_tools()
             tools = []
             for t in raw.tools:
+                schema = _build_args_schema(t.inputSchema, f"{t.name}Args")
                 lc_tool = StructuredTool.from_function(
                     func=_make_mcp_caller(t.name, server_script),
                     name=t.name,
                     description=t.description or f"MCP tool: {t.name}",
+                    args_schema=schema,
                 )
                 tools.append(lc_tool)
             return tools, [t.name for t in raw.tools]
@@ -115,6 +150,16 @@ def extract_trace(result: dict) -> list:
     for m in result["messages"]:
         role = getattr(m, "type", "unknown")
         content = m.content
+
+        # Primary path: LangChain/LangGraph puts tool calls on tool_calls attribute
+        if hasattr(m, "tool_calls") and m.tool_calls:
+            for tc in m.tool_calls:
+                trace.append(
+                    {"role": "tool_call", "tool": tc["name"], "args": tc.get("args", {})}
+                )
+            continue
+
+        # Fallback: Anthropic-style content list (type="tool_use")
         if isinstance(content, list):
             for block in content:
                 if isinstance(block, dict) and block.get("type") == "tool_use":
@@ -152,7 +197,7 @@ async def main() -> None:
     tools, tool_names = await discover_tools(SERVER_SCRIPT)
     print(f"\n  Discovered {len(tools)} tools: {tool_names}")
 
-    agent = create_react_agent(llm, tools)
+    agent = create_react_agent(llm, tools, prompt=_SYSTEM_PROMPT)
     output = {"server_script": SERVER_SCRIPT, "tools_discovered": tool_names, "queries": {}}
 
     # ── Query 1: search + detail fetch ────────────────────────────────────────

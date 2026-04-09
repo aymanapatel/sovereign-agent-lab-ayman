@@ -13,7 +13,6 @@ Run `python grade.py ex2` to check for obvious issues.
 # described but not executed. Names are inferred from the model's text response.
 # Root cause and fix documented in Insights.md.
 
-# TODOAyman: Double check with log
 TASK_A_TOOLS_CALLED = [
     "check_pub_availability",
     "check_pub_availability",

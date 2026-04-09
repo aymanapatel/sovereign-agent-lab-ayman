@@ -1,0 +1,9 @@
+
+============================================================
+  PART A — Baseline Dataset
+  Model: meta-llama/Llama-3.3-70B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (180 tokens)
+  [XML     ] ✅  →  "The Albanach"  (251 tokens)
+  [SANDWICH] ✅  →  "The Albanach"  (289 tokens)

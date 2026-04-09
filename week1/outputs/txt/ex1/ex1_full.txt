@@ -1,0 +1,47 @@
+Exercise 1 — Context Engineering Benchmark
+Three parts. ~2 minutes total.
+
+
+============================================================
+  PART A — Baseline Dataset
+  Model: meta-llama/Llama-3.3-70B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (180 tokens)
+  [XML     ] ✅  →  "The Albanach"  (251 tokens)
+  [SANDWICH] ✅  →  "The Albanach"  (289 tokens)
+
+  ⚠️  All three conditions correct.
+     This is common on strong models with clean data.
+     Part B adds near-miss distractors to lower the SNR.
+
+============================================================
+  PART B — Near-Miss Distractors Added
+  Model: meta-llama/Llama-3.3-70B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (213 tokens)
+  [XML     ] ✅  →  "The Albanach"  (302 tokens)
+  [SANDWICH] ✅  →  "The Albanach"  (340 tokens)
+
+  ⚠️  All three conditions correct.
+     This is common on strong models with clean data.
+     Part B adds near-miss distractors to lower the SNR.
+
+  → A and B all-correct. Running Part C (8B model) to show the effect.
+
+============================================================
+  PART C — Small Model Stress Test (8B)
+  Model: meta-llama/Meta-Llama-3.1-8B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (188 tokens)
+  [XML     ] ✅  →  "The Haymarket Vaults"  (278 tokens)
+  [SANDWICH] ✅  →  "The Haymarket Vaults"  (316 tokens)
+
+  ⚠️  All three conditions correct.
+     This is common on strong models with clean data.
+     Part B adds near-miss distractors to lower the SNR.
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex1_results.json
+    Fill in week1/answers/ex1_answers.py

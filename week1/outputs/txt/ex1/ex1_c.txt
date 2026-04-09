@@ -1,0 +1,13 @@
+
+============================================================
+  PART C — Small Model Stress Test (8B)
+  Model: meta-llama/Meta-Llama-3.1-8B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (188 tokens)
+  [XML     ] ✅  →  "The Haymarket Vaults"  (278 tokens)
+  [SANDWICH] ✅  →  "The Haymarket Vaults"  (316 tokens)
+
+  ⚠️  All three conditions correct.
+     This is common on strong models with clean data.
+     Part B adds near-miss distractors to lower the SNR.

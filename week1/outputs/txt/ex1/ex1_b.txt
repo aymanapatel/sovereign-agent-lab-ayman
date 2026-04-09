@@ -1,0 +1,9 @@
+
+============================================================
+  PART B — Near-Miss Distractors Added
+  Model: meta-llama/Llama-3.3-70B-Instruct
+============================================================
+
+  [PLAIN   ] ✅  →  "The Haymarket Vaults"  (213 tokens)
+  [XML     ] ✅  →  "The Albanach"  (302 tokens)
+  [SANDWICH] ✅  →  "The Albanach"  (340 tokens)

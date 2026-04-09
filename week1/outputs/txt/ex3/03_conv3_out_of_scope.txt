@@ -1,0 +1,10 @@
+Conversation 3 — Out of Scope (parking request)
+============================================================
+> input -> calling to confirm a booking
+Bot: How many guests are you confirming for tonight's event?
+> input -> 160 guests
+Bot: And how many of those guests will need vegan meals?
+> input -> can you arrange parking for the speakers?
+Bot: I'm sorry, I'm not trained to help with that.
+Bot: I can only help with confirming tonight's venue booking. For anything else, please contact the event organiser directly.
+Bot: Would you like to continue with confirm booking?

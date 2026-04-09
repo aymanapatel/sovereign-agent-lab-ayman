@@ -1,0 +1,11 @@
+Conversation 2 — Deposit Too High (500 deposit)
+============================================================
+> input -> calling to confirm a booking
+Bot: How many guests are you confirming for tonight's event?
+> input -> 160 guests
+Bot: And how many of those guests will need vegan meals?
+> input -> about 50 need vegan
+Bot: What deposit amount in GBP are you proposing to secure the booking?
+> input -> 500 deposit
+Bot: I need to check one thing with the organiser before I can confirm. The issue is: it is past 16:45 — insufficient time to process the confirmation before the 5 PM deadline. Can I call you back within 15 minutes?
+Bot: Is there anything else I can help you with?

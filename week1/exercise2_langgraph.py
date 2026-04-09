@@ -46,7 +46,6 @@ Then fill in week1/answers/ex2_answers.py.
 
 import json
 import sys
-from contextlib import contextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -62,33 +61,6 @@ load_dotenv()
 
 OUTPUTS_DIR = Path(__file__).parent / "outputs"
 OUTPUTS_DIR.mkdir(exist_ok=True)
-
-TXT_DIR = OUTPUTS_DIR / "txt" / "ex2"
-TXT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-@contextmanager
-def log_to_file(filepath: Path):
-    """Duplicate stdout to a numbered log file while keeping terminal output."""
-    original = sys.stdout
-    log = open(filepath, "w", encoding="utf-8")
-
-    class _Tee:
-        def write(self, msg):
-            original.write(msg)
-            log.write(msg)
-        def flush(self):
-            original.flush()
-            log.flush()
-        def isatty(self):
-            return False
-
-    sys.stdout = _Tee()
-    try:
-        yield
-    finally:
-        sys.stdout = original
-        log.close()
 
 
 # ─── Display helper ───────────────────────────────────────────────────────────
@@ -284,21 +256,17 @@ def main(which: str = "all") -> None:
     output = {}
 
     if which in ("all", "task_a"):
-        with log_to_file(TXT_DIR / "01_task_a.txt"):
-            output["task_a"] = task_a()
+        output["task_a"] = task_a()
 
     if which in ("all", "task_b"):
-        with log_to_file(TXT_DIR / "02_task_b.txt"):
-            output["task_b"] = task_b()
+        output["task_b"] = task_b()
 
     if which in ("all", "task_c"):
-        with log_to_file(TXT_DIR / "03_task_c.txt"):
-            results = task_c()
+        results = task_c()
         output["task_c"] = results
 
     if which in ("all", "task_d"):
-        with log_to_file(TXT_DIR / "04_task_d.txt"):
-            output["task_d_mermaid"] = task_d()
+        output["task_d_mermaid"] = task_d()
 
     out_path = OUTPUTS_DIR / "ex2_results.json"
     out_path.write_text(json.dumps(output, indent=2, default=str))

@@ -1,0 +1,20 @@
+
+--- Task B: Flyer Tool ---
+  If generate_event_flyer is still a stub, you'll see 'STUB' in the output.
+  Implement the TODO in sovereign_agent/tools/venue_tools.py first.
+
+
+=================================================================
+  TASK B — Flyer Tool
+=================================================================
+
+  [HUMAN]
+  The Haymarket Vaults is confirmed for 160 guests tonight. Generate a promotional flyer with the theme 'Edinburgh AI Meetup, tech professionals, modern venue'.
+
+  [TOOL_CALL] → generate_event_flyer({"venue_name": "The Haymarket Vaults", "event_theme": "Edinburgh AI Meetup, tech)
+  [TOOL]
+  {"success": true, "prompt_used": "Professional event flyer for Edinburgh AI Meetup, tech professionals, modern venue at The Haymarket Vaults, Edinburgh. 160 guests tonight. Warm lighting, Scottish architecture background, clean modern typography.", "image_url": "https://pictures-storage.storage.eu-north1.nebius.cloud/text2img-08a8ef2e-516a-41a3-aa1c-5201c066ecf2_00001_.webp"}
+
+  [AI]
+  The function call to generate a promotional event flyer for The Haymarket Vaults with the theme 'Edinburgh AI Meetup, tech professionals, modern venue' and 160 guests is successful. The generated flyer image can be accessed at the provided URL.
+

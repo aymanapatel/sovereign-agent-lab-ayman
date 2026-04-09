@@ -1,0 +1,61 @@
+
+Exercise 4 — LangGraph + MCP
+Discovering tools from mcp_venue_server.py...
+
+  Discovered 2 tools: ['search_venues', 'get_venue_details']
+
+=================================================================
+  Query 1 — Search + Detail Fetch
+=================================================================
+
+  [HUMAN]
+  Find Edinburgh venues for 160 guests with vegan options and give me the full address of the best match.
+
+  [TOOL_CALL] → search_venues({"min_capacity": "160", "requires_vegan": "true"})
+  [TOOL]
+  {"matches": [{"name": "The Haymarket Vaults", "capacity": 160, "vegan": true, "status": "available", "address": "1 Dalry Road, Edinburgh"}], "count": 1}
+
+  [TOOL_CALL] → get_venue_details({"pub_name": "The Haymarket Vaults"})
+  [TOOL]
+  {"success": true, "name": "The Haymarket Vaults", "capacity": 160, "vegan": true, "status": "available", "address": "1 Dalry Road, Edinburgh"}
+
+  [AI]
+  The best match for your requirements is "The Haymarket Vaults" with a capacity of 160 guests and vegan options available. The full address of this venue is 1 Dalry Road, Edinburgh.
+
+
+=================================================================
+  Query 2 — Impossible Constraint
+=================================================================
+
+  [HUMAN]
+  Find a venue for 300 people with vegan options.
+
+  [TOOL_CALL] → search_venues({"min_capacity": "300", "requires_vegan": "true"})
+  [TOOL]
+  {"matches": [], "count": 0}
+
+  [TOOL_CALL] → search_venues({"min_capacity": "300", "requires_vegan": "true"})
+  [TOOL]
+  {"matches": [], "count": 0}
+
+  [TOOL_CALL] → search_venues({"min_capacity": "300", "requires_vegan": "true"})
+  [TOOL]
+  {"matches": [], "count": 0}
+
+  [AI]
+  There are no venues available that can accommodate 300 people and offer vegan options.
+
+
+─────────────────────────────────────────────────────────────────
+REQUIRED EXPERIMENT (before filling in ex4_answers.py):
+
+  1. Open sovereign_agent/tools/mcp_venue_server.py
+  2. Change The Albanach's status from 'available' to 'full'
+  3. Save and run this script again
+  4. Compare the output to what you just saw
+  5. Revert the change
+
+  Record what changed (and what didn't) in ex4_answers.py → EX4_EXPERIMENT_RESULT
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex4_results.json
+    Complete the experiment above, then fill in week1/answers/ex4_answers.py

@@ -6,16 +6,8 @@
 
 ## Issues Encountered
 
-### 1. `'ascii' codec can't encode character '\u2713'` — Rasa + LiteLLM encoding bug
-**Problem:** When Rasa's `CompactLLMCommandGenerator` called the Nebius LLM via LiteLLM using `provider: self-hosted`, every request failed with `InternalServerError: Hosted_vllmException - 'ascii' codec can't encode character '\u2713' in position 21`. The same error appeared for the `openai` provider on embeddings. Direct LiteLLM calls to the same endpoint worked fine.
 
-**Root cause:** The first Rasa server startup was launched from the wrong working directory (not `exercise3_rasa/`) before environment variables were fully exported, causing the server to fail to resolve `${NEBIUS_KEY}` from `endpoints.yml`. Once the server was restarted from `exercise3_rasa/` with properly exported `NEBIUS_KEY` and `RASA_PRO_LICENSE`, all calls succeeded.
-
-**Fix:** Export environment variables before running `uv run rasa run`, and always start the server from the `exercise3_rasa/` directory.
-
----
-
-### 2. Two terminals required — action server + Rasa server must both run
+### 1. Two terminals required — action server + Rasa server must both run
 **Problem:** The exercise requires two separate processes: `rasa run actions` (port 5055) handles custom Python logic; `rasa run --enable-api` (port 5005) handles the conversation. If the action server is not running when `action_validate_booking` is triggered, the conversation silently errors.
 
 **Fix:** Start both processes before sending any messages. Check `curl http://localhost:5055/health` and `curl http://localhost:5005/status` before running conversations.
@@ -46,21 +38,6 @@ In Conversation 1, the deposit (£200) and vegan ratio (50/160 = 31%) both passe
 
 ### Out-of-scope deflection with flow resumption
 When the user asked about parking in Conversation 3, CALM triggered `handle_out_of_scope`, displayed `utter_out_of_scope`, and then offered to resume `confirm_booking`. The paused flow's slot state was preserved. LangGraph in Exercise 2 had no equivalent — its out-of-scope response was a confusing "your input lacks details" that gave no indication of the agent's actual scope.
-
-### REST API for automated testing
-The `--enable-api` flag exposes a `POST /webhooks/rest/webhook` endpoint that accepts `{"sender": "...", "message": "..."}`. This allows scripted conversation testing without interactive `rasa shell`. Using unique `sender` IDs isolates conversation state.
-
----
-
-## Run Log Files (`week1/outputs/txt/ex3/`)
-
-| File | Description |
-|---|---|
-| `01_conv1_happy.txt` | Happy path: 160 guests, 50 vegan, £200 deposit — escalated by time cutoff |
-| `02_conv2_deposit_high.txt` | Deposit too high: £500 — escalated by time cutoff |
-| `03_conv3_out_of_scope.txt` | Parking request during vegan_count collection — deflected then offered to resume |
-
----
 
 # Exercise 4 — MCP Client
 

@@ -7,7 +7,7 @@ WHY THIS FILE IS SIMPLER THAN OLD RASA TUTORIALS
 In old Rasa (open source 3.x), you needed two classes:
 
   1. ValidateBookingConfirmationForm
-     A FormValidationAction subclass with validate_guest_count(),
+     A form-validation subclass with validate_guest_count(),
      validate_vegan_count(), etc. Each method used regex to parse
      "about 160 people" → 160.0 from raw text.
 

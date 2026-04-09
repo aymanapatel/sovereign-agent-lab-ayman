@@ -191,58 +191,54 @@ def calculate_catering_cost(guests: int, price_per_head_gbp: float) -> str:
 
 
 @tool
-def generate_event_flyer(venue_name: str, guest_count: int, event_theme: str) -> str:
+def generate_event_flyer(
+    venue_name: str = "",
+    guest_count: int = 0,
+    event_theme: str = "",
+    pub_name: str = "",
+) -> str:
     """
     Generate a promotional event flyer image for the confirmed Edinburgh venue.
     Call this AFTER a venue is confirmed, as the final output step.
     Returns a URL to the generated image.
-    venue_name: the confirmed pub name
+    venue_name/pub_name: the confirmed pub name
     guest_count: confirmed number of attendees
     event_theme: short description, e.g. 'AI Meetup, professional, Scottish'
     """
-    # ── TODO: Replace this stub with a real images.generate() call ───────────
-    #
-    # 1. Import OpenAI at the top of this file:
-    #      from openai import OpenAI
-    #      import os
-    #
-    # 2. Create the client:
-    #      client = OpenAI(
-    #          base_url="https://api.tokenfactory.nebius.com/v1/",
-    #          api_key=os.getenv("NEBIUS_KEY"),
-    #      )
-    #
-    # 3. Build the prompt — include venue name, guest count, event theme:
-    #      prompt = (
-    #          f"Professional event flyer for {event_theme} at {venue_name}, "
-    #          f"Edinburgh. {guest_count} guests tonight. Warm lighting, "
-    #          f"Scottish architecture background, clean modern typography."
-    #      )
-    #
-    # 4. Call the image API:
-    #      response = client.images.generate(
-    #          model="black-forest-labs/flux-schnell",
-    #          prompt=prompt,
-    #          n=1,
-    #      )
-    #      url = response.data[0].url
-    #
-    # 5. Return a dict with at minimum: success, prompt_used, image_url
-    #    On failure, return: success=False, error=str(e), prompt_used, image_url=""
-    #
-    # When implemented, the mechanical check in grade.py will pass automatically.
-    # ──────────────────────────────────────────────────────────────────────────
+    resolved_venue = (venue_name or pub_name or "").strip()
 
     prompt = (
-        f"Professional event flyer for {event_theme} at {venue_name}, "
+        f"Professional event flyer for {event_theme} at {resolved_venue}, "
         f"Edinburgh. {guest_count} guests tonight. Warm lighting, "
         "Scottish architecture background, clean modern typography."
     )
 
+    if not resolved_venue:
+        return json.dumps(
+            {
+                "success": False,
+                "error": "A venue name is required (venue_name or pub_name).",
+                "prompt_used": prompt,
+                "image_url": "",
+            }
+        )
+
+    api_key = (os.getenv("NEBIUS_KEY") or "").strip()
+    if not api_key:
+        return json.dumps(
+            {
+                "success": False,
+                "error": "NEBIUS_KEY is not set",
+                "prompt_used": prompt,
+                "image_url": "",
+            }
+        )
+
     try:
         client = OpenAI(
             base_url="https://api.tokenfactory.nebius.com/v1/",
-            api_key=os.getenv("NEBIUS_KEY"),
+            api_key=api_key,
+            timeout=10.0,
         )
         response = client.images.generate(
             model="black-forest-labs/flux-schnell",

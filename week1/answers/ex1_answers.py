@@ -24,11 +24,13 @@ PART_A_SANDWICH_CORRECT = True
 # Explain what you observed. Minimum 30 words.
 
 PART_A_EXPLANATION = """
-All three conditions were correct, but the format influenced which valid venue the model chose.
-PLAIN format returned "The Haymarket Vaults" (appearing later in the list), while XML and SANDWICH
-both returned "The Albanach" (the first entry). This suggests that structured XML formatting
-amplifies primacy bias — the model anchors on the first well-formed record it encounters and stops
-searching once constraints are satisfied, rather than evaluating all options exhaustively.
+All three formats gave a correct answer, but they didn't agree on which one. PLAIN returned
+"The Haymarket Vaults" — the second eligible venue — while XML and SANDWICH both landed on
+"The Albanach", which appears first. The mechanism matters: XML tags create hard boundaries
+between records, so the model processes each <venue> block as a discrete unit. When the first
+record passes all constraints, it commits and stops. PLAIN text flows together without those
+boundaries, so the model keeps scanning and ends up further into the list. Formatting changed
+not just readability but search depth — and with it, which correct answer came out.
 """
 
 # ── Part B ─────────────────────────────────────────────────────────────────
@@ -67,12 +69,15 @@ PART_C_SANDWICH_ANSWER = "The Haymarket Vaults"
 
 # Explain what Part C showed, or why it wasn't needed. Minimum 30 words.
 PART_C_EXPLANATION = """
-Part C ran because both Part A and Part B were all-correct on the 70B model, meaning no structural
-effect was visible yet. The 8B model (Meta-Llama-3.1-8B-Instruct) also answered correctly in all
-three conditions, but interestingly it consistently chose "The Haymarket Vaults" across all formats
-rather than "The Albanach". This is the opposite of the 70B pattern — the smaller model appears
-less susceptible to primacy bias in XML-structured input, suggesting it parses XML tags less
-fluently and evaluates entries more sequentially without anchoring on the first match.
+Part C ran because both Part A and Part B were all-correct on the 70B model — no structural
+differentiation visible yet. The 8B model (Meta-Llama-3.1-8B-Instruct) also got every answer
+right, but with an inverted pattern: it consistently picked "The Haymarket Vaults" regardless
+of format, where the 70B model swung toward "The Albanach" under XML. My best explanation is
+that the 70B model reads XML structure as signal and anchors on the first well-formed record;
+the 8B model either ignores XML cues or scans more linearly and ends up further into the list.
+The more interesting takeaway: format sensitivity is not simply worse as models get smaller —
+it's different. A weaker model can be less affected by structural priming for reasons entirely
+unrelated to capability.
 """
 
 # ── Core lesson ────────────────────────────────────────────────────────────
@@ -81,11 +86,12 @@ fluently and evaluates entries more sequentially without anchoring on the first 
 # "Context formatting matters most when..."
 
 CORE_LESSON = """
-Context formatting matters most when the signal-to-noise ratio is low: when near-miss distractors
-closely resemble the correct answer, when the model must evaluate multiple constraints simultaneously
-rather than matching a single keyword, and when using smaller or weaker models with limited
-multi-step reasoning capacity. On clean datasets with a strong frontier model the effect can vanish
-entirely — every format works. But add adversarial distractors, bury the answer mid-context, or
-drop to a smaller model and the structural scaffold (XML tags, repeated query reminders at top and
-bottom) becomes the difference between the model finding the needle and picking the wrong piece of hay.
+Context formatting matters most when the signal-to-noise ratio is low — when near-miss distractors
+closely resemble the correct answer, when the model must check multiple constraints rather than
+match a single keyword, and when you are working with smaller models that have limited multi-step
+reasoning. On clean data with a strong model, the effect vanishes: every format works and the task
+is easy regardless. But add adversarial distractors, bury the answer mid-context, or drop to a
+weaker model, and the structural scaffold — XML tags, repeated query reminders at top and bottom —
+becomes the difference between finding the needle and pulling out the wrong piece of hay. The lesson
+is not "always use XML." It is: know when formatting is doing real cognitive work for the model.
 """

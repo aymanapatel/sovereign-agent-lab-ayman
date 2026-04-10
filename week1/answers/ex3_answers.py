@@ -97,19 +97,19 @@ continue. The paused slot collection (vegan_count) was preserved in state.
 # Compare Rasa CALM's handling of the out-of-scope request to what
 # LangGraph did in Exercise 2 Scenario 3. Min 40 words.
 OUT_OF_SCOPE_COMPARISON = """
-In Exercise 2 Scenario 3, the LangGraph agent responded to the train-times
-question with "Your input is lacking necessary details" — a misleading
-non-answer that gave no indication the agent is scoped to venue bookings.
-It did not try to call a tool, which was correct, but it offered no clear
-boundary statement.
+The fundamental difference is architecture, not wording. LangGraph has no flow
+to resume: when the train-times question arrived, there was no paused state to
+return to. The agent said "Your input is lacking necessary details" and the
+thread was effectively dead — technically harmless (it didn't hallucinate a
+train schedule) but it gave the user no path forward, and wrongly implied the
+problem was with the question rather than the agent's scope.
 
-Rasa CALM's response was cleaner on two counts: it said explicitly "I can
-only help with confirming tonight's venue booking — for anything else,
-contact the organiser directly", and it preserved the interrupted flow state
-and offered to resume it. The LangGraph agent had no concept of a paused
-flow to return to — each query is stateless unless the developer adds memory.
-CALM's explicit handle_out_of_scope flow turns what would be a confusing
-dead-end into a structured, recoverable deflection.
+CALM handled the same situation with two moves: an explicit boundary message
+("I can only help with confirming tonight's venue booking") and an immediate
+offer to resume the interrupted confirm_booking flow, with all previously
+collected slots still intact. That recovery isn't cosmetic — it's only possible
+because CALM tracks flow state. A LangGraph agent would need explicit memory
+and resumption logic added by the developer to do anything equivalent.
 """
 
 # ── Task B: Cutoff guard ───────────────────────────────────────────────────
@@ -156,20 +156,19 @@ external API. In the old Rasa, slot extraction was deterministic and offline.
 # ── The setup cost ─────────────────────────────────────────────────────────
 
 SETUP_COST_VALUE = """
-The setup cost — config.yml, domain.yml, flows.yml, endpoints.yml,
-rasa train, two terminals, Rasa Pro licence — bought a hard constraint
-architecture that LangGraph cannot provide. The CALM agent cannot deviate
-from the declared steps in flows.yml: it always asks for guest_count, then
-vegan_count, then deposit_amount_gbp, always runs action_validate_booking,
-and cannot call any tool that is not declared in the domain. That
-predictability is the feature for a confirmation use case. A pub manager
-calling to confirm a booking must always receive the same questions in the
-same order and must always have the deposit check run — no model can
-skip it or reorder it based on conversation context.
+The setup cost — config.yml, domain.yml, flows.yml, endpoints.yml, rasa train,
+two terminals, Rasa Pro licence — bought one thing LangGraph cannot provide:
+a guarantee. The CALM agent cannot skip the deposit check. It cannot reorder
+the questions. It cannot improvise a response outside flows.yml. That is the
+feature, not the limitation. For a booking confirmation workflow that must be
+auditable and consistent, "the LLM can't deviate from the script" is exactly
+what you want.
 
-LangGraph has no such guarantee. In Scenario 3 of Exercise 2 the LangGraph
-agent did not know what to say and gave a misleading error. The Rasa CALM
-agent, by contrast, showed an explicit boundary message and offered to resume.
-The limitation — CALM cannot improvise a response outside flows.yml — is
-exactly what makes it trustworthy for auditable, repeatable business processes.
+The comparison in Exercise 2 Scenario 3 made this concrete: the LangGraph
+agent had no handle_out_of_scope procedure, produced a confusing non-answer,
+and had nowhere to go. CALM's handle_out_of_scope is declared ahead of time,
+so even edge cases are handled predictably. You pay for CALM in YAML files,
+a licence, and setup overhead. You get back a system that behaves identically
+on call 10,000 as it did on call one — which is the only acceptable behaviour
+for a process that touches money and headcounts.
 """

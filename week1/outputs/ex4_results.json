@@ -22,7 +22,7 @@
         },
         {
           "role": "tool",
-          "content": "{\"matches\": [{\"name\": \"The Haymarket Vaults\", \"capacity\": 160, \"vegan\": true, \"status\": \"available\", \"address\": \"1 Dalry Road, Edinburgh\"}], \"count\": 1}"
+          "content": "{\"matches\": [{\"name\": \"The Albanach\", \"capacity\": 180, \"vegan\": true, \"status\": \"available\", \"address\": \"2 Hunter Square, Edinburgh\"}, {\"name\": \"The Haymarket Vaults\", \"capacity\": 160, \"vegan\": true, \"status\": \"available\", \"address\": \"1 Dalry Road, Edinburgh\"}], \"count\": 2}"
         },
         {
           "role": "tool_call",

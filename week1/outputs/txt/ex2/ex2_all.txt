@@ -1,0 +1,7 @@
+[32m✓ .env file found(B[m
+[35mExercise 2 — LangGraph Research Agent (all tasks)(B[m
+
+uv run python week1/exercise2_langgraph.py
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1

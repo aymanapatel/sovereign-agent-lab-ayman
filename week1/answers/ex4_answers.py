@@ -38,15 +38,18 @@ LINES_OF_TOOL_CODE_EX4 = 39   # _build_args_schema + _make_mcp_caller + discover
 
 # What does MCP buy you beyond "the tools are in a separate file"? Min 30 words.
 MCP_VALUE_PROPOSITION = """
-MCP gives you a language-agnostic, transport-agnostic contract over stdio.
-Any client — the LangGraph agent today, a Rasa action tomorrow, a CLI tool
-next week — connects to the same server without knowing how the tools are
-implemented. When the venue database changes, you update one file and every
-client picks it up on the next call. With hardcoded tools you must update
-each caller separately; with MCP the server is the single source of truth
-and tool discovery is dynamic. That boundary also means the server can be
-versioned, restarted, or swapped for a different implementation without
-touching client code at all.
+The experiment showed it directly: changing The Albanach's status to "full" in
+mcp_venue_server.py immediately changed the agent's search results on the next
+run. exercise4_mcp_client.py was untouched. One file changed, one source of
+truth, zero client updates.
+
+With hardcoded tools you repeat that change everywhere the tool is referenced —
+the LangGraph agent, any Rasa action that needs the same data, any CLI tool
+you build later. MCP moves the update to the server. The client discovers
+available tools at connection time, so it picks up new or modified tools
+automatically. The server boundary also means you can version, restart, or
+swap the implementation entirely without touching a single caller — as long
+as the schema stays compatible, the contract holds.
 """
 
 # ── Week 5 architecture ────────────────────────────────────────────────────
@@ -77,19 +80,20 @@ WEEK_5_ARCHITECTURE = """
 # Must reference specific things you observed in your runs. Min 60 words.
 
 GUIDING_QUESTION_ANSWER = """
-The LangGraph ReAct loop is the right agent for research: in Query 1 I
-watched it call search_venues, receive two candidates, then independently
-decide to call get_venue_details for the best one — without being told to.
-That step-by-step reasoning over tool results is exactly what a free-form
-research task requires, and a rule-based system could not have decided which
-venue to detail-fetch on its own.
+In Query 1 I watched the LangGraph agent call search_venues, get two
+candidates back, then independently decide to call get_venue_details for
+the best one — without any instruction to do so. That unprompted follow-up
+is the thing a ReAct loop is good at: reasoning over a tool result and
+choosing the next step without a script. A rule-based system can't do that;
+it would need the developer to pre-declare "after search, always fetch details."
 
-Rasa CALM is the right agent for the confirmation call: it follows a
-declared flow (confirm_booking, ask for deposit, escalate if over limit)
-where every step is auditable and the outcome is deterministic. Swapping
-them feels wrong because a LangGraph agent has no guaranteed path through
-a booking flow — it could skip the deposit check or invent an escalation
-condition — while Rasa on a research task would break at the first question
-it has no declared step to answer, as I observed in Exercise 3's out-of-scope
-response where the CALM agent could not improvise beyond its flows.
+Rasa CALM is right for the confirmation call precisely because it cannot
+improvise. The flow runs (guests → vegan → deposit → validate) and nothing
+can reorder or skip it. Swapping them feels wrong in both directions:
+a LangGraph agent could skip the deposit check if the conversation led it
+somewhere unexpected; a CALM agent given a free-form research task would
+hit the first unanswered question and stall — exactly what happened in
+Exercise 3 Conversation 3 when the parking question arrived. Each architecture
+has a constraint that is simultaneously its biggest weakness and its biggest
+strength, depending entirely on what you're building.
 """

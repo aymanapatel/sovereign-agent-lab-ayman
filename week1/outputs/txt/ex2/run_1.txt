@@ -1,0 +1,54 @@
+[32m✓ .env file found(B[m
+[35mExercise 4 — Shared MCP Server(B[m
+
+uv run python week1/exercise4_mcp_client.py
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/.venv/lib/python3.14/site-packages/langchain_core/_api/deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+[04/01/26 13:46:43] INFO     Processing request of type            server.py:720
+                             ListToolsRequest                                   
+/Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/exercise4_mcp_client.py:148: LangGraphDeprecatedSinceV10: create_react_agent has been moved to `langchain.agents`. Please update your import to `from langchain.agents import create_agent`. Deprecated in LangGraph V1.0 to be removed in V2.0.
+  agent  = create_react_agent(llm, tools)
+
+Exercise 4 — LangGraph + MCP
+Discovering tools from mcp_venue_server.py...
+
+  Discovered 2 tools: ['search_venues', 'get_venue_details']
+
+=================================================================
+  Query 1 — Search + Detail Fetch
+=================================================================
+
+  [HUMAN]
+  Find Edinburgh venues for 160 guests with vegan options and give me the full address of the best match.
+
+  [AI]
+  {"type": "function", "name": "search_venues", "parameters": {"kwargs": {"min_capacity": 160, "requires_vegan": true}}}
+
+
+=================================================================
+  Query 2 — Impossible Constraint
+=================================================================
+
+  [HUMAN]
+  Find a venue for 300 people with vegan options.
+
+  [AI]
+  {"type": "function", "name": "search_venues", "parameters": {"kwargs": {"min_capacity": 300, "requires_vegan": true}}}
+
+
+─────────────────────────────────────────────────────────────────
+REQUIRED EXPERIMENT (before filling in ex4_answers.py):
+
+  1. Open sovereign_agent/tools/mcp_venue_server.py
+  2. Change The Albanach's status from 'available' to 'full'
+  3. Save and run this script again
+  4. Compare the output to what you just saw
+  5. Revert the change
+
+  Record what changed (and what didn't) in ex4_answers.py → EX4_EXPERIMENT_RESULT
+
+✅  Results saved to /Users/aymanpatel/Desktop/nebius/assignments/module2-agents/week1/outputs/ex4_results.json
+    Complete the experiment above, then fill in week1/answers/ex4_answers.py
+
+[32m✓ Done. Complete the required experiment, then fill in week1/answers/ex4_answers.py(B[m
